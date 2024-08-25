@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import userRoute from "./routes/userRoute";
+import playerRoute from "./routes/playerRoute";
 require("./mongoose");
 
 const app = express();
@@ -19,3 +20,4 @@ app.listen(port, () => {
 });
 
 app.use("/user", userRoute);
+app.use("/player", playerRoute);
