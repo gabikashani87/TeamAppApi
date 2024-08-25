@@ -2,6 +2,8 @@ import User from "../models/User";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
+import { IPlayer } from "../models/Player";
+import playerController from "./PlayerController";
 
 interface UserData {
   first_name: string;
@@ -17,8 +19,35 @@ const addUser = async (userData: UserData) => {
   return result;
 };
 
+const getUserPlayers = async (req: Request, res: Response) => {
+  const { userID } = req.query;
+
+  try {
+    const user = await User.findOne({ _id: userID }).populate("players");
+    return res.status(200).json(user);
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
+const addPlayer = async (req: Request, res: Response) => {
+  try {
+    let playerData: IPlayer = { ...req.body, user: req.body.userID };
+    return res
+      .status(200)
+      .json({ message: await playerController.addPlayerToDB(playerData) });
+  } catch (err) {
+    return res.status(500).json(err);
+  }
+};
+
 const registerUser = async (req: Request, res: Response) => {
-  let { email, password } = req.body;
+  let {
+    email,
+    password,
+    firstName: first_name,
+    lastName: last_name,
+  } = req.body;
   email = email.toLowerCase();
   try {
     const user = await User.findOne({ email });
@@ -29,7 +58,15 @@ const registerUser = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, salt);
     let userData: UserData = req.body;
     userData.password = hashedPassword;
-    return res.status(200).json({ message: await addUser(userData) });
+    debugger;
+    return res.status(200).json({
+      message: await addUser({
+        email,
+        password: hashedPassword,
+        first_name,
+        last_name,
+      }),
+    });
   } catch (err) {
     return res.status(500).json(err);
   }
@@ -39,6 +76,7 @@ const loginUser = async (req: Request, res: Response) => {
   let { email, password } = req.body;
 
   try {
+    debugger;
     email = email.toLowerCase();
     const user = await User.findOne({ email });
     if (!user) {
@@ -59,6 +97,7 @@ const loginUser = async (req: Request, res: Response) => {
 
 const authUser = async (req: Request, res: Response) => {
   try {
+    debugger;
     const user = await User.findById(req.body.user).select("-password");
     if (!user) {
       return res.status(400).json({ errors: { msg: "No User Found" } });
@@ -73,6 +112,8 @@ const userController = {
   authUser,
   registerUser,
   loginUser,
+  getUserPlayers,
+  addPlayer,
 };
 
 export default userController;

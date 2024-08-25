@@ -1,30 +1,14 @@
-import Player from "../models/Player";
-import { Request, Response } from "express";
+import Player, { IPlayer } from "../models/Player";
 
-interface PlayerData {
-  name: string;
-  rank: number;
-}
-
-const addPlayerToDB = async (playerData: PlayerData) => {
+const addPlayerToDB = async (playerData: IPlayer) => {
   const createdPlayer = new Player(playerData);
-
+  debugger;
   let result = await createdPlayer.save();
   return result;
 };
 
-const addPlayer = async (req: Request, res: Response) => {
-  debugger;
-  try {
-    let playerData: PlayerData = req.body;
-    return res.status(200).json({ message: await addPlayerToDB(playerData) });
-  } catch (err) {
-    return res.status(500).json(err);
-  }
-};
-
 const playerController = {
-  addPlayer,
+  addPlayerToDB,
 };
 
 export default playerController;
