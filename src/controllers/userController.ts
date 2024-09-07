@@ -6,8 +6,8 @@ import { IPlayer } from "../models/Player";
 import playerController from "./PlayerController";
 
 interface UserData {
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
@@ -42,12 +42,7 @@ const addPlayer = async (req: Request, res: Response) => {
 };
 
 const registerUser = async (req: Request, res: Response) => {
-  let {
-    email,
-    password,
-    firstName: first_name,
-    lastName: last_name,
-  } = req.body;
+  let { email, password, firstName, lastName } = req.body;
   email = email.toLowerCase();
   try {
     const user = await User.findOne({ email });
@@ -63,8 +58,8 @@ const registerUser = async (req: Request, res: Response) => {
       message: await addUser({
         email,
         password: hashedPassword,
-        first_name,
-        last_name,
+        firstName,
+        lastName,
       }),
     });
   } catch (err) {
