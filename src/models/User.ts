@@ -41,7 +41,24 @@ UserSchema.virtual("lastName")
   });
 
 // Ensure virtuals are included in JSON responses
-UserSchema.set("toJSON", { virtuals: true });
-UserSchema.set("toObject", { virtuals: true });
+UserSchema.set("toJSON", {
+  virtuals: true, // Include virtuals
+  transform: (doc, ret) => {
+    // Remove original snake_case fields
+    delete ret.first_name;
+    delete ret.last_name;
+    delete ret.__v; // Optionally remove __v (version key)
+    return ret;
+  },
+});
+UserSchema.set("toObject", {
+  virtuals: true,
+  transform: (doc, ret) => {
+    delete ret.first_name;
+    delete ret.last_name;
+    delete ret.__v;
+    return ret;
+  },
+});
 
 export default mongoose.model("User", UserSchema);
