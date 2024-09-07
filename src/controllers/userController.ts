@@ -23,7 +23,12 @@ const getUserPlayers = async (req: Request, res: Response) => {
   const { userID } = req.params;
 
   try {
-    const user = await User.findOne({ _id: userID }).populate("players");
+    const user = await User.findOne({ _id: userID }).populate({
+      path: "players",
+      options: {
+        sort: { rank: -1 },
+      },
+    });
     return res.status(200).json(user);
   } catch (err) {
     return res.status(500).json(err);
