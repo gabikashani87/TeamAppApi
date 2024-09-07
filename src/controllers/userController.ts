@@ -20,7 +20,7 @@ const addUser = async (userData: UserData) => {
 };
 
 const getUserPlayers = async (req: Request, res: Response) => {
-  const { userID } = req.query;
+  const { userID } = req.params;
 
   try {
     const user = await User.findOne({ _id: userID }).populate("players");
@@ -33,9 +33,14 @@ const getUserPlayers = async (req: Request, res: Response) => {
 const addPlayer = async (req: Request, res: Response) => {
   try {
     let playerData: IPlayer = { ...req.body, user: req.body.userID };
-    return res
-      .status(200)
-      .json({ message: await playerController.addPlayerToDB(playerData) });
+    const player = await playerController.addPlayerToDB(playerData);
+
+    const user = await User.findById(req.body.userID);
+    if (user) {
+      user.players.push(player._id); // Add the player's ID to user's players array
+      await user.save(); // Save the updated user document
+    }
+    return res.status(200).json({ message: player });
   } catch (err) {
     return res.status(500).json(err);
   }
