@@ -1,5 +1,6 @@
 import Team, { ITeam } from "../models/Team";
 import { Request, Response } from "express";
+import { ceil } from "lodash";
 
 const splitArrayIntoGroups = (
   arr: Array<{ rank: number; name: string }>,
@@ -45,7 +46,7 @@ const splitArrayIntoGroups = (
       }),
       { rank: 0 }
     );
-    return sum.rank / group.length;
+    return ceil(sum.rank / group.length, 2);
   });
 
   return { groups, averages };
